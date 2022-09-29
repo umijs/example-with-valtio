@@ -1,18 +1,21 @@
 import { proxy, proxyMap, snapshot, subscribe } from 'umi';
 
-export function proxyWithPersist<V>(
+export function proxyWithPersist<V extends Record<string, any>>(
   initialState: V,
   opts: {
     persistKey: string;
   },
 ) {
   const localItem = localStorage.getItem(opts.persistKey);
-  console.log('> load', localItem);
-  const store = proxy({
-    ...(localItem ? restore(JSON.parse(localItem)) : initialState),
-    // @ts-ignore
-    actions: initialState.actions,
+  const state = localItem ? restore(JSON.parse(localItem)) : initialState;
+  Object.keys(initialState).forEach((key) => {
+    if (!(key in state)) {
+      state[key] = initialState[key];
+    }
   });
+  // @ts-ignore
+  state.actions = initialState.actions;
+  const store = proxy(state);
   subscribe(store, () => {
     localStorage.setItem(opts.persistKey, JSON.stringify(toJSON(store)));
   });
@@ -29,7 +32,7 @@ function restore(data: any) {
 function toJSON(store: any) {
   const json = snapshot(store);
   const filteredJSON = Object.keys(json).reduce<any>((memo, key) => {
-    if (!['actions', 'subscriptions'].includes(key)) {
+    if (!['actions', 'subscriptions', 'themes'].includes(key)) {
       memo[key] = json[key];
     }
     return memo;

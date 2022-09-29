@@ -15,6 +15,7 @@ export const Preview: React.FC = () => {
 
   return (
     <div
+      id="preview"
       dangerouslySetInnerHTML={{
         __html: md.render(file.content),
       }}

@@ -6,6 +6,7 @@ import {
   snapshot,
 } from 'umi';
 import { proxyWithPersist } from '@/libs/proxyWithPersist';
+import { themes } from './constants';
 
 export interface File {
   name: string;
@@ -37,6 +38,8 @@ export const store = proxyWithPersist(
         },
       ],
     ]),
+    themes: Object.keys(themes) as string[],
+    currentTheme: 'github',
     actions: {
       addFile(name: string) {
         const baseName = name.replace(/\.md$/, '');
@@ -56,11 +59,13 @@ export const store = proxyWithPersist(
         if (file) {
           file.content = content;
           file.updated_at = Date.now();
-          console.log('> ', JSON.stringify(store), store);
         }
       },
       openFile(name: string) {
         store.currentFile = name;
+      },
+      changeTheme(theme: string) {
+        store.currentTheme = theme;
       },
     },
   },
