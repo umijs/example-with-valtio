@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "umi build",
+    "dev": "umi dev",
+    "setup": "umi setup"
+  },
+  "devDependencies": {
+    "@monaco-editor/react": "^4.4.6",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@umijs/plugins": "4.0.0-canary.20220928.1",
+    "clsx": "^1.2.1",
+    "firebase": "^2",
+    "markdown-it": "^13.0.1",
+    "path-to-regexp": "1",
+    "prettier": "^2",
+    "prettier-plugin-organize-imports": "^2",
+    "prettier-plugin-packagejson": "^2",
+    "typescript": "^4",
+    "umi": "4.0.0-canary.20220928.1",
+    "valtio-persist": "^1.0.2"
+  }
+}
