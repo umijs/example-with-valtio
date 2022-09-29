@@ -38,8 +38,15 @@ export const store = proxyWithPersist(
       ],
     ]),
     actions: {
-      addFile(file: File) {
-        store.files.set(file.name, file);
+      addFile(name: string) {
+        const baseName = name.replace(/\.md$/, '');
+        store.files.set(name, {
+          name,
+          content: `# ${baseName}`,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        });
+        store.currentFile = name;
       },
       removeFile(name: string) {
         store.files.delete(name);
