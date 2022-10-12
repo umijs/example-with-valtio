@@ -1,6 +1,17 @@
-import MonacoEditor from '@monaco-editor/react';
+import MonacoEditor, { loader } from '@monaco-editor/react';
 import { useSnapshot } from 'umi';
 import { store } from './store';
+
+loader.config({
+  'vs/nls': {
+    availableLanguages: {
+      '*': 'zh-cn',
+    },
+  },
+  paths: {
+    vs: 'https://gw.alipayobjects.com/os/lib/monaco-editor/0.33.0/min/vs',
+  },
+});
 
 export const Editor: React.FC = () => {
   const { currentFile, files } = useSnapshot(store);
@@ -17,7 +28,7 @@ export const Editor: React.FC = () => {
         language="markdown"
         theme="vs-dark"
         value={file.content}
-        key={currentFile}
+        path={currentFile}
         options={{
           wordWrap: 'on',
         }}
