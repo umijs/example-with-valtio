@@ -1,15 +1,15 @@
 import { proxy } from 'umi';
 
-const store = proxy({
+const state = proxy({
   userInfo: {
     name: 'sorrycc',
     mail: 'sorrycc@gmail.com',
   } as Record<string, string> | null,
   actions: {
     logout() {
-      store.userInfo = null;
+      state.userInfo = null;
     },
   },
 });
 
-export default store;
+export default state;

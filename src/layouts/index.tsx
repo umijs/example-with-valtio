@@ -1,5 +1,5 @@
 import { Outlet, useSnapshot, Link } from 'umi';
-import globalStore from '@/stores/global';
+import globalStore from '@/states/global';
 import styles from './index.less';
 import { NavLink } from '@/components/NavLink';
 
