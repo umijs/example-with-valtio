@@ -70,7 +70,7 @@ function SimpleTodoItem({ todo }: { todo: Todo }) {
   }
 
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log(e.key);
+    // if the Escape is not working try to disable your browser's vim extension
     if (e.key === 'Escape') {
       setIsEditing(false);
       setEditText(todo.text);
