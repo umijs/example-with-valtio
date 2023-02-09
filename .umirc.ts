@@ -17,4 +17,5 @@ export default {
     { path: '/editor', component: 'editor' },
   ],
   plugins: ['@umijs/plugins/dist/valtio'],
+  valtio: {},
 };

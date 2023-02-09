@@ -1,10 +1,11 @@
-import { Todo } from '../pages/todo/store';
+import type { Todo } from '@/pages/todos/states/todo';
 import { defineMock } from 'umi';
 
 let id = 0;
 let todos = new Map<number, Todo>([
   [999, { id: 999, text: 'Learn Umi', completed: false }],
   [998, { id: 998, text: 'Learn Bigfish', completed: false }],
+  [997, { id: 997, text: 'Learn Rust', completed: false }],
 ]);
 
 export default defineMock({

@@ -1,6 +1,8 @@
-import {useSnapshot} from 'umi';
-import {actions, state, Todo, useFilteredTodos} from './states/todo';
-import React, {useEffect, useState} from 'react';
+import { useSnapshot } from 'umi';
+import { actions, state, Todo, useFilteredTodos } from './states/todo';
+import React, { useEffect, useState } from 'react';
+import { TodoItemWithMemoAndPrimitiveProps } from './components/TodoItemWithMemoAndPrimitiveProps';
+import { TodoItemUseProxy } from './components/TodoItemUseProxy';
 
 function AddTodoInput() {
   const [v, setV] = useState('');
@@ -9,7 +11,7 @@ function AddTodoInput() {
     e.preventDefault();
     if (v.trim().length > 0) {
       setV('');
-      actions.addTodo({text: v.trim()});
+      actions.addTodo({ text: v.trim() });
     }
   }
 
@@ -26,10 +28,9 @@ function AddTodoInput() {
 
 function TodoList() {
   const todos = useFilteredTodos();
-  const {loading} = useSnapshot(state);
+  const { loading } = useSnapshot(state);
   useEffect(() => {
-    actions.fetchTodos().catch((e) => {
-    });
+    actions.fetchTodos().catch((e) => {});
   }, []);
   if (loading) return <div>loading...</div>;
   if (!todos.length) return null;
@@ -37,14 +38,19 @@ function TodoList() {
     <div>
       <ul>
         {todos.map((todo) => {
-          return <TodoItemNoExtraRender key={todo.id} {...todo}/>;
+          return <SimpleTodoItem key={todo.id} todo={todo} />;
+          // uncomment to try React.memo way optimized component
+          // return <TodoItemWithMemoAndPrimitiveProps key={todo.id} {...todo} />;
+
+          // uncomment to try useSnapshot way optimized component
+          // return <TodoItemUseProxy key={todo.id} todo={state.todos.get(todo.id)!} />;
         })}
       </ul>
     </div>
   );
 }
 
-function TodoItem({todo}: { todo: Todo }) {
+function SimpleTodoItem({ todo }: { todo: Todo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
 
@@ -60,8 +66,7 @@ function TodoItem({todo}: { todo: Todo }) {
   }
 
   function handleDelete() {
-    actions.removeTodo(todo.id).catch((e) => {
-    });
+    actions.removeTodo(todo.id).catch((e) => {});
   }
 
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -71,13 +76,12 @@ function TodoItem({todo}: { todo: Todo }) {
       setEditText(todo.text);
     } else if (e.key === 'Enter' && editText.trim().length > 0) {
       setIsEditing(false);
-      actions.updateTodo(todo.id, editText).catch((e) => {
-      });
+      actions.updateTodo(todo.id, editText).catch((e) => {});
     }
   };
   return (
     <li>
-      <div style={{display: isEditing ? 'none' : 'block'}}>
+      <div style={{ display: isEditing ? 'none' : 'block' }}>
         <input
           type="checkbox"
           checked={todo.completed}
@@ -89,7 +93,7 @@ function TodoItem({todo}: { todo: Todo }) {
           delete
         </button>
       </div>
-      <div style={{display: isEditing ? 'block' : 'none'}}>
+      <div style={{ display: isEditing ? 'block' : 'none' }}>
         <input
           disabled={todo.updating}
           value={editText}
@@ -101,67 +105,8 @@ function TodoItem({todo}: { todo: Todo }) {
   );
 }
 
-const TodoItemNoExtraRender = React.memo(({text,id ,updating,completed}: Todo ) => {
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(text);
-
-  function handleCheckBoxChange() {
-    actions.toggleTodo(id);
-  }
-
-  function handleDoubleClick() {
-    if (updating) {
-      return;
-    }
-    setIsEditing(true);
-  }
-
-  function handleDelete() {
-    actions.removeTodo(id).catch((e) => {
-    });
-  }
-
-  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log(e.key);
-    if (e.key === 'Escape') {
-      setIsEditing(false);
-      setEditText(text);
-    } else if (e.key === 'Enter' && editText.trim().length > 0) {
-      setIsEditing(false);
-      actions.updateTodo(id, editText).catch((e) => {
-      });
-    }
-  };
-  return (
-    <li>
-      <div style={{display: isEditing ? 'none' : 'block'}}>
-        <input
-          type="checkbox"
-          checked={completed}
-          disabled={updating}
-          onChange={handleCheckBoxChange}
-        />
-        <span onDoubleClick={handleDoubleClick}>{text}</span>
-        <button onClick={handleDelete} disabled={updating}>
-          delete
-        </button>
-      </div>
-      <div style={{display: isEditing ? 'block' : 'none'}}>
-        <input
-          disabled={updating}
-          value={editText}
-          onChange={(e) => setEditText(e.target.value)}
-          onKeyDown={handleKeydown}
-        />
-      </div>
-    </li>
-  );
-});
-
-
 function Filter() {
-  const {count, filter} = useSnapshot(state);
+  const { count, filter } = useSnapshot(state);
   if (!count.active && !count.completed) return null;
   return (
     <div>
@@ -169,19 +114,19 @@ function Filter() {
       <span>left</span>
       <button
         onClick={() => actions.toggleFilter('all')}
-        style={filter === 'all' ? {color: 'red'} : {}}
+        style={filter === 'all' ? { color: 'red' } : {}}
       >
         All
       </button>
       <button
         onClick={() => actions.toggleFilter('todo')}
-        style={filter === 'todo' ? {color: 'red'} : {}}
+        style={filter === 'todo' ? { color: 'red' } : {}}
       >
         Todo
       </button>
       <button
         onClick={() => actions.toggleFilter('done')}
-        style={filter === 'done' ? {color: 'red'} : {}}
+        style={filter === 'done' ? { color: 'red' } : {}}
       >
         Done
       </button>
@@ -192,9 +137,9 @@ function Filter() {
 export default () => {
   return (
     <div>
-      <AddTodoInput/>
-      <TodoList/>
-      <Filter/>
+      <AddTodoInput />
+      <TodoList />
+      <Filter />
     </div>
   );
 };
