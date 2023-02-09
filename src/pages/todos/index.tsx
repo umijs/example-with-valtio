@@ -1,9 +1,12 @@
 import { useSnapshot } from 'umi';
-import { actions, store, Todo, useTodos } from './store';
+import { actions, state, Todo, useFilteredTodos } from './states/todo';
 import React, { useEffect, useState } from 'react';
+import { TodoItemWithMemoAndPrimitiveProps } from './components/TodoItemWithMemoAndPrimitiveProps';
+import { TodoItemUseProxy } from './components/TodoItemUseProxy';
 
 function AddTodoInput() {
   const [v, setV] = useState('');
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (v.trim().length > 0) {
@@ -11,6 +14,7 @@ function AddTodoInput() {
       actions.addTodo({ text: v.trim() });
     }
   }
+
   return (
     <form onSubmit={handleSubmit}>
       <input
@@ -23,8 +27,8 @@ function AddTodoInput() {
 }
 
 function TodoList() {
-  const todos = useTodos();
-  const { loading } = useSnapshot(store);
+  const todos = useFilteredTodos();
+  const { loading } = useSnapshot(state);
   useEffect(() => {
     actions.fetchTodos().catch((e) => {});
   }, []);
@@ -34,26 +38,39 @@ function TodoList() {
     <div>
       <ul>
         {todos.map((todo) => {
-          return <TodoItem key={todo.id} todo={todo} />;
+          return <SimpleTodoItem key={todo.id} todo={todo} />;
+          // uncomment to try React.memo way optimized component
+          // return <TodoItemWithMemoAndPrimitiveProps key={todo.id} {...todo} />;
+
+          // uncomment to try useSnapshot way optimized component
+          // return <TodoItemUseProxy key={todo.id} todo={state.todos.get(todo.id)!} />;
         })}
       </ul>
     </div>
   );
 }
 
-function TodoItem({ todo }: { todo: Todo }) {
+function SimpleTodoItem({ todo }: { todo: Todo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
+
   function handleCheckBoxChange() {
     actions.toggleTodo(todo.id);
   }
+
   function handleDoubleClick() {
+    if (todo.updating) {
+      return;
+    }
     setIsEditing(true);
   }
+
   function handleDelete() {
     actions.removeTodo(todo.id).catch((e) => {});
   }
+
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // if the Escape is not working try to disable your browser's vim extension
     if (e.key === 'Escape') {
       setIsEditing(false);
       setEditText(todo.text);
@@ -68,13 +85,17 @@ function TodoItem({ todo }: { todo: Todo }) {
         <input
           type="checkbox"
           checked={todo.completed}
+          disabled={todo.updating}
           onChange={handleCheckBoxChange}
         />
         <span onDoubleClick={handleDoubleClick}>{todo.text}</span>
-        <button onClick={handleDelete}>delete</button>
+        <button onClick={handleDelete} disabled={todo.updating}>
+          delete
+        </button>
       </div>
       <div style={{ display: isEditing ? 'block' : 'none' }}>
         <input
+          disabled={todo.updating}
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
           onKeyDown={handleKeydown}
@@ -85,7 +106,7 @@ function TodoItem({ todo }: { todo: Todo }) {
 }
 
 function Filter() {
-  const { count, filter } = useSnapshot(store);
+  const { count, filter } = useSnapshot(state);
   if (!count.active && !count.completed) return null;
   return (
     <div>

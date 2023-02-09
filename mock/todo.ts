@@ -1,10 +1,11 @@
-import { Todo } from "../pages/todo/store";
-import { defineMock } from "umi";
+import type { Todo } from '@/pages/todos/states/todo';
+import { defineMock } from 'umi';
 
 let id = 0;
 let todos = new Map<number, Todo>([
-  [999, {id: 999, text: 'Learn Umi', completed: false}],
-  [998, {id: 998, text: 'Learn Bigfish', completed: false}],
+  [999, { id: 999, text: 'Learn Umi', completed: false }],
+  [998, { id: 998, text: 'Learn Bigfish', completed: false }],
+  [997, { id: 997, text: 'Learn Rust', completed: false }],
 ]);
 
 export default defineMock({
@@ -23,7 +24,7 @@ export default defineMock({
 
   'POST /api/todos/toggleAll': (req, res) => {
     const completed = req.body.completed;
-    todos.forEach(todo => {
+    todos.forEach((todo) => {
       todo.completed = completed;
     });
     res.json({ success: true, todos: Array.from(todos.entries()) });
@@ -34,7 +35,10 @@ export default defineMock({
     const todo = todos.get(id);
     if (todo) {
       Object.assign(todo, req.body);
-      res.json({ success: true, todo });
+      const randomDelay = 500 + Math.floor(Math.random() * 2000);
+      setTimeout(() => {
+        res.json({ success: true, todo });
+      }, randomDelay);
     } else {
       res.status(404);
       res.end();
@@ -51,5 +55,5 @@ export default defineMock({
       res.status(404);
       res.end();
     }
-  }
+  },
 });
